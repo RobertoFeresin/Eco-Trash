@@ -1,0 +1,76 @@
+import serial
+import tkinter as tk
+from tkinter import ttk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.animation import FuncAnimation
+
+# Configurações da porta serial
+port = 'COM8'
+baud_rate = 9600
+
+# Inicializa a lista para armazenar os dados do gráfico
+data = {'0': 0, '1': 0, '2': 0}  # Contagem para cada pino
+cores = {'0': 'blue', '1': 'orange', '2': 'green'}  # Cores para cada pino
+
+# Função para inicializar o gráfico de barras
+def init_bar_chart():
+    fig, ax = plt.subplots()
+    ax.set_title('Contagem do Estado do Switch')
+    ax.set_ylabel('Contagem')
+    ax.set_xlabel('Pinos')
+    return fig, ax
+
+# Função para atualizar o gráfico com os dados mais recentes
+def update_bar_chart(frame):
+    line = ser.readline().decode('utf-8').strip()
+    if line:
+        estado, pino = line.split()[-2:]  # Obtém o estado e o número do pino
+        pino = pino.strip()
+        if estado == 'fimdecurso_ligado' and data[pino] == 0:
+            data[pino] = 1
+            update_bar()  # Atualiza o gráfico de barras
+        elif estado == 'fimdecurso_desligado' and data[pino] == 1:
+            data[pino] = 0
+            update_bar()  # Atualiza o gráfico de barras
+
+# Função para atualizar o gráfico de barras
+def update_bar():
+    ax.clear()
+    for i, (pino, contagem) in enumerate(data.items()):
+        ax.bar(i, contagem, color=cores[pino], label=f'Pino {pino}')
+        ax.text(i, contagem, str(contagem), ha='center', va='bottom')
+    ax.set_title('Contagem do Estado do Switch')
+    ax.set_ylabel('Contagem')
+    ax.set_xlabel('Pinos')
+    ax.legend()
+    canvas.draw()
+
+# Tenta abrir a porta serial
+try:
+    ser = serial.Serial(port, baud_rate, timeout=1)
+    print(f'Conectado a {port} com {baud_rate} baud.')
+except serial.SerialException as e:
+    print(f'Erro ao tentar abrir a porta serial: {e}')
+    exit()
+
+# Inicializa o gráfico de barras
+fig, ax = init_bar_chart()
+
+# Cria a janela Tkinter
+root = tk.Tk()
+root.title("Contagem do Estado do Switch")
+
+# Adiciona o gráfico à janela Tkinter
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas_widget = canvas.get_tk_widget()
+canvas_widget.pack(fill=tk.BOTH, expand=True)
+
+# Atualiza o gráfico de barras em intervalos regulares
+ani = FuncAnimation(fig, update_bar_chart, frames=None, interval=100)
+
+# Inicia o loop principal da interface gráfica Tkinter
+root.mainloop()
+
+# Fecha a porta serial ao fechar a janela
+ser.close()
