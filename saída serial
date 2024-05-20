@@ -1,0 +1,33 @@
+const int pinoChave0 = 7; // PINO DIGITAL UTILIZADO PELA CHAVE FIM DE CURSO
+const int pinoChave1 = 8;
+const int pinoChave2 = 9;
+const int corAmarelo = 0;
+const int corVermelho = 1;
+const int corAzul = 2;
+
+void setup() {
+  pinMode(pinoChave0, INPUT_PULLUP);
+  pinMode(pinoChave1, INPUT_PULLUP);
+  pinMode(pinoChave2, INPUT_PULLUP); // DEFINE O PINO COMO ENTRADA COM RESISTOR PULLUP
+  Serial.begin(9600);                // INICIA A COMUNICAÇÃO SERIAL
+}
+
+void loop() {
+  if (digitalRead(pinoChave0) == LOW) { // SE A LEITURA DO PINO FOR IGUAL A LOW
+    Serial.println("fimdecurso_ligado 0");   // IMPRIME NO SERIAL "Chave acionada"
+  } else {                              // SENÃO
+    Serial.println("fimdecurso_desligado 0"); // IMPRIME NO SERIAL "Chave desacionada"
+  }
+  if (digitalRead(pinoChave1) == LOW) { // SE A LEITURA DO PINO FOR IGUAL A LOW
+    Serial.println("fimdecurso_ligado 1");   // IMPRIME NO SERIAL "Chave acionada"
+  } else {                              // SENÃO
+    Serial.println("fimdecurso_desligado 1"); // IMPRIME NO SERIAL "Chave desacionada"
+  }
+  if (digitalRead(pinoChave2) == LOW) { // SE A LEITURA DO PINO FOR IGUAL A LOW
+    Serial.println("fimdecurso_ligado 2");   // IMPRIME NO SERIAL "Chave acionada"
+  } else {                              // SENÃO
+    Serial.println("fimdecurso_desligado 2"); // IMPRIME NO SERIAL "Chave desacionada"
+  }
+
+  delay(1000); // DELAY PARA EVITAR LEITURAS RÁPIDAS DEMAIS
+}
